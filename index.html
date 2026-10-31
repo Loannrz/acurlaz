@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>Acurlaz</title>
+    <meta name="description" content="Acurlaz, DJ de musique électronique : ses sons, ses prochaines dates et ses réseaux, sur deux platines et une table de mixage en 3D." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Acurlaz" />
+    <meta property="og:description" content="DJ de musique électronique : sons, prochaines dates et réseaux, sur deux platines et une table de mixage en 3D." />
+    <meta property="og:locale" content="fr_FR" />
+    <link rel="icon" href="data:," />
+    <!-- 3D model: fetched while the scripts download (same request mode as the
+         fetch of src/scene/units.js). The build ships a gzipped copy (vite.config.js
+         sets gz = true): it is preloaded only where it can be inflated
+         (DecompressionStream; old Safari gets the plain .glb, as units.js does). -->
+    <script>
+      (function () {
+        var gz = false;
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'fetch';
+        link.crossOrigin = 'anonymous';
+        link.href = '%BASE_URL%models/pioneer_cdj_3000.glb' + (gz && typeof DecompressionStream === 'function' ? '.gz' : '');
+        document.head.appendChild(link);
+      })();
+    </script>
+    <!-- Loading screen: inline so it is the very first paint (no blank page, no
+         flash of the default background) while the scripts and assets load.
+         Driven by src/ui/loader.js. -->
+    <style>
+      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+      /* Phones: the page never scrolls, bounces or zooms (the canvas handles
+         every gesture itself); 100dvh = the visible height with the browser bars. */
+      html, body { overscroll-behavior: none; touch-action: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+      @supports (height: 100dvh) { html, body { height: 100dvh; } }
+      /* Loading screen: a plain progress bar centred on the page (thin discreet
+         track, light fill) and one word under it. Nothing moves except the bar. */
+      #loader {
+        position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+        background: #000;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: opacity 700ms ease;
+      }
+      #loader.done { opacity: 0; pointer-events: none; }
+      #loader[hidden] { display: none; }
+      #loader .loader-box {
+        box-sizing: border-box; width: min(240px, calc(100vw - 64px));
+        margin: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+      }
+      #loader .loader-track {
+        position: relative; height: 2px; border-radius: 1px; overflow: hidden;
+        background: rgba(255, 255, 255, 0.14);
+      }
+      /* full-width bar slid in from the left, moved by a transform (keeps gliding
+         while the page compiles) */
+      #loader .loader-fill {
+        position: absolute; inset: 0;
+        background: rgba(255, 255, 255, 0.92);
+        transform: translateX(-100%);
+        transition: transform 380ms cubic-bezier(0.25, 0.6, 0.3, 1);
+        will-change: transform;
+        /* while the scripts download: creeps to 4 % (the share of that step), then src/ui/loader.js takes over */
+        animation: loader-creep 2.4s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+      }
+      @keyframes loader-creep { to { transform: translateX(-96%); } }
+      #loader .loader-step {
+        display: block; margin-top: 14px; text-align: center;
+        font-size: 12px; font-weight: 400; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.6);
+        transition: opacity 160ms ease;
+      }
+      #loader .loader-step.swap { opacity: 0; }
+      #loader.failed .loader-track, #loader.failed .loader-step { display: none; }
+      #loader .loader-error { text-align: center; }
+      #loader .loader-error[hidden] { display: none; }
+      #loader .loader-msg { margin: 0 0 18px; font-size: 14px; line-height: 1.45; color: rgba(255, 255, 255, 0.86); }
+      #loader .loader-error button {
+        appearance: none; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 999px; background: transparent;
+        color: #fff; font: 500 13px/1 inherit; font-family: inherit; padding: 11px 22px; cursor: pointer;
+      }
+      #loader .loader-error button:hover { background: rgba(255, 255, 255, 0.08); }
+      #loader .loader-error button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+      @media (pointer: coarse) {
+        #loader .loader-box { width: min(260px, calc(100vw - 64px)); }
+        #loader .loader-error button { min-height: 44px; padding: 13px 26px; font-size: 15px; touch-action: manipulation; }
+        #loader .loader-step { font-size: 13px; }
+        #loader .loader-msg { font-size: 15px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #loader, #loader .loader-fill, #loader .loader-step { transition: none; animation: none; }
+      }
+    </style>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="loader" aria-busy="true">
+      <div class="loader-box">
+        <div class="loader-track" role="progressbar" aria-label="Chargement de l’introduction" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Chargement, 0 %">
+          <div class="loader-fill"></div>
+        </div>
+        <span class="loader-step" aria-hidden="true">Chargement</span>
+        <div class="loader-error" role="alert" hidden>
+          <p class="loader-msg"></p>
+          <button type="button">Réessayer</button>
+        </div>
+      </div>
+    </div>
+    <div id="app"></div>
+    <div id="flash"></div>
+    <button id="skip" class="hidden" type="button" aria-label="Passer l’introduction" inert>Passer</button>
+    <noscript><p style="position:fixed;inset:0;z-index:60;margin:0;display:grid;place-items:center;background:#000;color:#bbb;font:14px sans-serif">Activez JavaScript pour voir l’introduction.</p></noscript>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

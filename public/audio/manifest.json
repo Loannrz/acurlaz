@@ -1,0 +1,121 @@
+{
+ "sources": [
+  {
+   "id": "usb1",
+   "name": "USB 1",
+   "tracks": [
+    {
+     "file": "usb1-01.mp3",
+     "title": "Cyborg Ninja",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 1",
+     "bpm": 124,
+     "key": "6A",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cyborg%20Ninja.mp3"
+    },
+    {
+     "file": "usb1-02.mp3",
+     "title": "Digital Lemonade",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 2",
+     "bpm": 126,
+     "key": "8B",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Digital%20Lemonade.mp3"
+    },
+    {
+     "file": "usb1-03.mp3",
+     "title": "Rocket",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 3",
+     "bpm": 128,
+     "key": "4A",
+     "duration": 147.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Rocket.mp3"
+    }
+   ]
+  },
+  {
+   "id": "usb2",
+   "name": "USB 2",
+   "tracks": [
+    {
+     "file": "usb2-01.mp3",
+     "title": "Cut and Run",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 1",
+     "bpm": 122,
+     "key": "9A",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cut%20and%20Run.mp3"
+    },
+    {
+     "file": "usb2-02.mp3",
+     "title": "Ouroboros",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 2",
+     "bpm": 120,
+     "key": "5A",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Ouroboros.mp3"
+    },
+    {
+     "file": "usb2-03.mp3",
+     "title": "Danger Storm",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 3",
+     "bpm": 130,
+     "key": "7A",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Danger%20Storm.mp3"
+    }
+   ]
+  },
+  {
+   "id": "usb3",
+   "name": "USB 3",
+   "tracks": [
+    {
+     "file": "usb3-01.mp3",
+     "title": "Volatile Reaction",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 1",
+     "bpm": 125,
+     "key": "10A",
+     "duration": 150.0,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Volatile%20Reaction.mp3"
+    },
+    {
+     "file": "usb3-02.mp3",
+     "title": "Move Forward",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 2",
+     "bpm": 118,
+     "key": "3A",
+     "duration": 69.3,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Move%20Forward.mp3"
+    },
+    {
+     "file": "usb3-03.mp3",
+     "title": "Failing Defense",
+     "artist": "Kevin MacLeod",
+     "album": "Démo vol. 3",
+     "bpm": 127,
+     "key": "11B",
+     "duration": 105.5,
+     "license": "CC BY 4.0",
+     "sourceUrl": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Failing%20Defense.mp3"
+    }
+   ]
+  }
+ ]
+}
