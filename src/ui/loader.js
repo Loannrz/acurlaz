@@ -1,36 +1,59 @@
 // Loading screen (#loader, markup and styles inline in index.html so it shows
 // before any script). The intro waits behind it until everything it draws is
-// loaded, built, compiled and uploaded; the bar then reaches 100 % and fades.
+// loaded, built, compiled and uploaded. The logo fills in white from left to
+// right with the progress, a percentage under its right corner counts up, then
+// the screen fades out.
 //
 //   const loader = createLoader();
 //   loader.define({ model: 40, textures: 15, ... }) // weights of the real steps
-//   loader.set('model', 0.5, 'Chargement')        // fraction of one step (+ the word under the bar)
-//   loader.done('model')                            // step finished
+//   loader.set('model', 0.5)                         // fraction of one step
+//   loader.done('model')                             // step finished
 //   await loader.fail(message)                      // error + "Réessayer"; resolves on click
-//   await loader.complete()                         // 100 %, then fades out (resolves when the fade starts)
+//   await loader.complete()                         // 100 %, short pause, then fades out (resolves when the fade starts)
 //
-// The progress never goes back and never shows 100 % before complete(). The
-// bar moves by a CSS transform transition (compositor): it keeps gliding while
-// the main thread is busy compiling or parsing.
+// The real progress never goes back and never reaches 100 % before complete().
+// The displayed figure follows it one unit at a time (a few units per frame when
+// it lags far behind), so it never jumps; the logo fill is tied to that figure.
+// (The optional text arguments of set / done / label are ignored: no status word any more.)
+const STEP_MS = 24; // minimum time per displayed unit
+const HOLD_MS = 250; // pause on 100 % before the fade
+
 export function createLoader({ reducedMotion = false } = {}) {
   const el = document.getElementById('loader');
-  const bar = el?.querySelector('.loader-track'); // role="progressbar"
+  const bar = el?.querySelector('.loader-box'); // role="progressbar"
   const fill = el?.querySelector('.loader-fill');
-  const label = el?.querySelector('.loader-step');
+  const pct = el?.querySelector('.loader-pct');
   const error = el?.querySelector('.loader-error');
   const steps = new Map(); // name -> { weight, value }
-  let shown = 0; // 0..1, never decreases
+  let shown = 0; // real progress 0..1, never decreases
   let finished = false;
-  let lastText = '';
-  let swapTimer = 0;
+  let shownPct = 0; // displayed integer 0..100
+  let raf = 0, lastStep = 0;
+  let waiters = [];
 
+  const paint = () => {
+    fill?.style.setProperty('clip-path', `inset(0 ${100 - shownPct}% 0 0)`);
+    if (pct) pct.textContent = `${shownPct} %`;
+    bar?.setAttribute('aria-valuenow', String(shownPct));
+    bar?.setAttribute('aria-valuetext', `Chargement ${shownPct} %`);
+  };
+  const flush = () => { if (shownPct >= 100 || (finished && shownPct >= Math.round(shown * 100))) { const w = waiters; waiters = []; for (const f of w) f(); } };
+  const tick = (now) => {
+    raf = 0;
+    const target = Math.round(shown * 100);
+    if (shownPct < target && now - lastStep >= STEP_MS) {
+      // one unit per step; more when far behind (never a jump of more than a few)
+      shownPct = Math.min(target, shownPct + Math.max(1, Math.min(4, Math.floor((target - shownPct) / 12))));
+      lastStep = now;
+      paint();
+    }
+    if (shownPct < target) raf = requestAnimationFrame(tick);
+    else flush();
+  };
   const write = () => {
     if (!el) return;
-    const p = Math.round(shown * 100);
-    if (fill && fill.style.animationName !== 'none') fill.style.animationName = 'none'; // end of the CSS creep (index.html)
-    fill?.style.setProperty('transform', `translateX(${((shown - 1) * 100).toFixed(2)}%)`);
-    bar?.setAttribute('aria-valuenow', String(p));
-    bar?.setAttribute('aria-valuetext', `${lastText || 'Chargement'}, ${p} %`); // screen readers only: no figure on screen
+    if (reducedMotion) { shownPct = Math.round(shown * 100); paint(); flush(); return; } // no easing: the fill still follows
+    if (!raf) raf = requestAnimationFrame(tick);
   };
   const update = () => {
     let sum = 0, total = 0;
@@ -38,16 +61,7 @@ export function createLoader({ reducedMotion = false } = {}) {
     const target = total ? Math.min(finished ? 1 : 0.99, sum / total) : 0;
     if (target > shown) { shown = target; write(); }
   };
-  const setLabel = (text) => {
-    if (!text || text === lastText || !label) return;
-    lastText = text;
-    write();
-    // short cross-fade of the word (instant with reduced motion)
-    if (reducedMotion) { label.textContent = text; return; }
-    label.classList.add('swap');
-    clearTimeout(swapTimer);
-    swapTimer = setTimeout(() => { label.textContent = lastText; label.classList.remove('swap'); }, 160);
-  };
+  const setLabel = () => {};
 
   return {
     get progress() { return shown; },
@@ -56,13 +70,12 @@ export function createLoader({ reducedMotion = false } = {}) {
       for (const [name, weight] of Object.entries(weights)) if (!steps.has(name)) steps.set(name, { weight, value: 0 });
       update();
     },
-    set(name, value, text) {
+    set(name, value) {
       const s = steps.get(name);
       if (s) s.value = Math.max(s.value, Math.min(1, Math.max(0, value || 0)));
-      setLabel(text);
       update();
     },
-    done(name, text) { this.set(name, 1, text); },
+    done(name) { this.set(name, 1); },
     label: setLabel,
     // Error message with a "Réessayer" button; resolves when it is pressed.
     fail(message) {
@@ -84,10 +97,11 @@ export function createLoader({ reducedMotion = false } = {}) {
     remove() { el?.remove(); },
     async complete() {
       finished = true;
-      setLabel('Prêt');
       update();
-      // let the 100 % be seen (the bar transition takes ~350 ms)
-      await new Promise((r) => setTimeout(r, reducedMotion ? 60 : 380));
+      // the figure reaches 100 % (a timeout covers a throttled background tab), then a short pause
+      if (!reducedMotion && shownPct < 100) await new Promise((r) => { waiters.push(r); setTimeout(r, 2500); });
+      shownPct = 100; paint();
+      await new Promise((r) => setTimeout(r, reducedMotion ? 60 : HOLD_MS));
       if (!el) return;
       el.classList.add('done');
       el.setAttribute('aria-busy', 'false');

@@ -19,6 +19,14 @@ export const INVITE = {
 };
 
 // Screen view on a phone held upright (src/ui/focusTip.js): how to see the screen bigger.
+// Phrase typed in a loop at the bottom of the window (src/ui/typeNote.js); it takes
+// over the invitation above (same message). `short`: used when the full one would
+// not fit on one line (narrow phone).
+export const TYPE_NOTE = {
+  mouse: { text: 'Cliquez sur les écrans pour naviguer et en savoir plus.', short: 'Cliquez sur les écrans pour naviguer.' },
+  touch: { text: 'Touchez les écrans pour naviguer et en savoir plus.', short: 'Touchez les écrans pour naviguer.' },
+};
+
 export const FOCUS_TIP = 'Pincez pour agrandir, ou tournez le téléphone';
 
 export const TOP_KEY_HINTS = {

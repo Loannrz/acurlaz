@@ -111,7 +111,7 @@ mêmes images (captures avant / après identiques au pixel près).
 - **Page** : `viewport-fit=cover`, `100dvh`, `touch-action: none`,
   `overscroll-behavior: none`, gestes de zoom iOS refusés : ni zoom de la page ni
   rebond. Marges de sécurité (`env(safe-area-inset-*)`) pour « Passer »,
-  l'invitation (« Touchez un écran pour entrer »), les info-bulles et le
+  la phrase du bas (« Touchez les écrans pour naviguer… »), les info-bulles et le
   chargement. « Passer » : 44 px de haut, en bas à droite, à portée du pouce.
   Lecture / pause : touche PLAY du CDJ ou bouton ▶ de l'écran de lecture.
 - **Astuce en focus portrait** (`src/ui/focusTip.js`) : « Pincez pour agrandir,
@@ -150,25 +150,31 @@ vérifier sur un iPhone.
 ## Écran de chargement
 
 Plein écran, inline dans `index.html` (affiché avant tout script : jamais de
-page vide), piloté par `src/ui/loader.js` : une barre de progression classique
-centrée sur le fond noir de la page (piste fine et discrète, remplissage clair,
-240 px de large ; ni carte, ni verre, ni ombre) et un seul mot en petit dessous
-(« Chargement », « Préparation », « Presque prêt », « Prêt »), sans pourcentage. La barre (`role="progressbar"`, `aria-valuenow`,
-`aria-valuetext` pour les lecteurs d'écran) est pondérée par les étapes réelles : code,
+page vide), piloté par `src/ui/loader.js` : le logo (`public/img/acurlaz-logo.png`,
+préchargé par un `<link rel="preload">` et affiché avant tout script) centré sur
+le fond noir, largeur `min(60vw, 520px)` (70vw sur téléphone en portrait), d'abord
+très estompé et grisé (opacité 0,15), qui se remplit en blanc de gauche à droite
+avec la progression (deux copies superposées ; celle du dessus passée en blanc par
+`filter: brightness(0) invert(1)` et révélée par `clip-path: inset(0 X% 0 0)`, bord
+net). Un compteur « 1 % … 100 % » (chiffres tabulaires, petit, fin) est sous le coin
+droit du logo ; il monte d'une unité à la fois (24 ms par unité, quelques unités par
+image au plus s'il est très en retard) et le remplissage suit ce chiffre. Plus de
+barre ni de mot d'état. Le bloc `role="progressbar"` garde `aria-valuenow` et
+`aria-valuetext` (« Chargement 42 % »). La progression est pondérée par les étapes
+réelles : code,
 modèle 3D (octets reçus), textures du décor (octets reçus), montage (découpe du
 modèle, contrôles, décalque), cuisson de la lumière du décor, écrans (manifeste
 audio, photo décodée, premières pages), shaders (compilés par parties), envoi des
-textures et images de chauffe, choix de la résolution. Elle ne recule jamais,
-glisse par une transition CSS (elle bouge même quand le fil principal compile) et
-n'atteint 100 % que lorsque tout est prêt ; l'écran se retire alors en fondu et
+textures et images de chauffe, choix de la résolution. Elle ne recule jamais et
+n'atteint 100 % que lorsque tout est prêt ; après une pause de 250 ms l'écran se retire en fondu et
 l'intro démarre à t = 0, sans compilation ni envoi de texture pendant
 l'animation. Le préchargement du modèle (`index.html`, petit script inline) ne
 demande le `.glb.gz` que si `DecompressionStream` existe (sinon le `.glb`, comme
 `src/scene/units.js`) ; en cas de repli sur le `.glb` après un `.gz` illisible,
-la barre continue d'avancer pendant ce second téléchargement (le `.gz` n'en
+la progression continue pendant ce second téléchargement (le `.gz` n'en
 remplit que 90 %). Échec du modèle : message et bouton « Réessayer » (nouvelle
 tentative sans recharger) ; autre échec : message et rechargement ; sans WebGL 2 :
-message de repli. Mouvement réduit : pas de transition, intro passée.
+message de repli. Mouvement réduit : pas de transition ni de comptage animé (le remplissage suit toujours le pourcentage), intro passée.
 Poids des étapes et mots : `loader.define(...)` / `loader.label(...)` dans
 `src/main.js` ; style : `<style>` de `index.html`. Aucun son n'est chargé avant un geste (les MP3 se chargent au LOAD).
 
@@ -306,13 +312,19 @@ f.onChange(({ type, unit, zone }) => {}); // type : 'enter' | 'exit' | 'exited'
 
 Textes modifiables dans `src/data/hints.js` (rien d'autre à toucher).
 
-- **Invitation** (`src/ui/invite.js`) : ligne discrète en bas au centre
-  (« Cliquez sur un écran pour entrer », « Touchez… » sans souris), en fondu
-  0,9 s après la fin de l'intro, jamais pendant l'intro. Disparaît au premier
-  focus écran, ou 8 s après la première interaction (clic, molette, info-bulle).
-  Mémorisée dans `localStorage` (`acurlaz:v1:invite`) : plus montrée aux visites
-  suivantes ; sans stockage, elle revient simplement. `R` la masque (sans la
-  mémoriser).
+- **Phrase du bas** (`src/ui/typeNote.js`, styles `#type-note`) : une ligne fixe,
+  centrée en bas de la fenêtre (au-dessus de la zone de sécurité), crème discret,
+  « Cliquez sur les écrans pour naviguer et en savoir plus. » (« Touchez… » sans
+  souris). Tapée en boucle comme au clavier (45 ms/caractère, curseur fin),
+  affichée 5 s en entier, effacée vite, puis reprise. Visible après l'intro,
+  masquée en fondu pendant le chargement, l'intro, le focus sur un écran (CDJ ou
+  mixer) et `R` ; elle revient à la sortie du focus. Jamais de retour à la ligne :
+  police en `clamp()` et, si la phrase ne tient pas (petit téléphone), version
+  courte « …pour naviguer. » (`short` dans `hints.js`). Mouvement réduit : texte
+  complet fixe, sans boucle. DOM / CSS seul (timers uniquement tant qu'elle est
+  visible) : le rendu 3D à la demande n'est pas sollicité. Elle remplace
+  l'ancienne invitation « Cliquez sur un écran pour entrer » (même message, donc
+  jamais les deux ; `src/ui/invite.js` n'est plus utilisé).
 - **Info-bulles** (`src/ui/tooltip.js`, styles `#hint`) : au survol souris d'une
   zone listée dans `hints.js` (écrans CDJ, touches du haut via leur libellé
   imprimé, PLAY, CUE, hot cues, boucles, SYNC, tempo, plateau ; crossfader,

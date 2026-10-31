@@ -15,8 +15,8 @@ import { lowBattery, isPortrait } from './utils/device.js';
 import { createLoader } from './ui/loader.js';
 import { createOverlay } from './ui/overlay.js';
 import { createTooltip } from './ui/tooltip.js';
-import { createInvite } from './ui/invite.js';
-import { hintFor, INVITE, FOCUS_TIP } from './data/hints.js';
+import { createTypeNote } from './ui/typeNote.js';
+import { hintFor, TYPE_NOTE, FOCUS_TIP } from './data/hints.js';
 import { createFocusTip } from './ui/focusTip.js';
 import { createRenderer, isWebGLAvailable } from './scene/renderer.js';
 import { buildStage } from './scene/stage.js';
@@ -201,7 +201,6 @@ async function boot() {
   // above the screen (the screen is the interface there); placed next to the zone,
   // avoiding both CDJ screens.
   const finePointer = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? true;
-  const invite = createInvite({ text: finePointer ? INVITE.mouse : INVITE.touch });
   let finished = false; // intro over (set by finish() below)
   const SCREEN_ZONES = ['cdj_left_screen', 'cdj_right_screen'];
   tooltip = createTooltip({
@@ -229,21 +228,22 @@ async function boot() {
     // in screen focus, only the printed keys above the screens (Sources ... Échap) keep their hint
     blocked: (id) => !finished || !!screenFocus?.busy || (!!screenFocus?.current && !screens.topLabelFor(id)),
   });
-  tooltip.onShow(() => invite.interacted());
-  renderer.domElement.addEventListener('pointerdown', () => invite.interacted());
-  renderer.domElement.addEventListener('wheel', () => invite.interacted(), { passive: true });
 
   const cables = createCables(units);
   const rig = createCameraRig(camera, { fitBox: stage.box });
   const zoom = createZoom(rig, renderer.domElement, { reducedMotion, camera });
   screenFocus = createScreenFocus({ rig, zoom, units, camera, reducedMotion, dom: renderer.domElement });
   screenFocus.onChange((e) => {
-    if (e.type === 'enter') { tooltip.hide(); invite.dismiss(); } // first screen view: the invitation has done its job
+    if (e.type === 'enter') tooltip.hide();
     if (e.type === 'enter' || e.type === 'exit') devPanel?.click({ id: `focus: ${e.zone} → ${e.type.toUpperCase()}`, unit: e.unit, label: e.type === 'enter' ? 'ENTER' : 'EXIT' });
     // The dev panel would hide keys of the focused screen: hidden meanwhile, put back as it was after.
     devPanel?.setFocus(e.type === 'enter');
     if (DEV) console.debug('[focus]', e);
   });
+  // Phrase typed in a loop at the bottom (replaces the old invitation pill): shown in
+  // the overview after the intro, faded out while a screen is focused.
+  const typeNote = createTypeNote({ ...(finePointer ? TYPE_NOTE.mouse : TYPE_NOTE.touch), reducedMotion });
+  screenFocus.onChange((e) => { if (e.type === 'enter') typeNote.hide(); else if (e.type === 'exit' && finished) typeNote.show(); });
   // Phone held upright: a tip in the screen view (pinch to magnify, or turn the phone).
   const focusTip = DEVICE.mobile ? createFocusTip({ focus: screenFocus, text: FOCUS_TIP, when: () => isPortrait() && DEVICE.phone }) : null;
   // While focused, the CDJ screen is a touch surface (canvas px events, hit regions).
@@ -293,7 +293,7 @@ async function boot() {
     zoom.setActive(true);
     mixer.resumeFx(); // a live Beat FX (closed by R) is heard again
     overlay.showSkip(false);
-    invite.show(); // fades in shortly after, unless already seen (localStorage)
+    typeNote.show();
     quality.pause(false);
     scheduleRetune();
     markDirty();
@@ -309,6 +309,7 @@ async function boot() {
     zoom.handleResize();
     screenFocus.refit();
     focusTip?.refresh();
+    typeNote.fit();
     markDirty(400);
   });
   if (params.speed) tl.timeScale(params.speed);
@@ -334,7 +335,7 @@ async function boot() {
     clearTimeout(retuneTimer);
     zoom.setActive(false);
     tooltip.hide();
-    invite.hide();
+    typeNote.hide();
     overlay.showSkip(true);
     quality.introTier(); // the intro's resolution tier (set before its first frame)
     retuned = false; // the still view may climb again at the end
@@ -352,7 +353,7 @@ async function boot() {
     devPanel = createDevPanel();
     devPanel.el.style.display = 'none'; // display disabled on purpose; the panel keeps logging in the background
     hotspots.setAltClickHandler((c) => { devPanel.coords(c); console.info('[local mm]', c); });
-    window.__intro = { tooltip, invite, tl, stage, screens, vu, hotspots, cables, rig, zoom, camera, introCamera, backdrop, screenFocus, screenTouch, screenUI, cdj, vuLive, controls, controlInput, mixer, mixerButtons, mixerLabel, scene, renderer, composer, units, params, quality, loader, ready: false };
+    window.__intro = { tooltip, typeNote, tl, stage, screens, vu, hotspots, cables, rig, zoom, camera, introCamera, backdrop, screenFocus, screenTouch, screenUI, cdj, vuLive, controls, controlInput, mixer, mixerButtons, mixerLabel, scene, renderer, composer, units, params, quality, loader, ready: false };
   }
 
   // --- warm up shaders and textures before the first frame ---
