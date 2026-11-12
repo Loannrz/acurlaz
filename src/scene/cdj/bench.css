@@ -1,0 +1,161 @@
+/* Banc d'essai du CDJ : outil de développement, hors build (non référencé par index.html).
+   Toutes les valeurs viennent de tokens.css. */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-text);
+}
+
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.bench {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(22rem, 100vw);
+  padding: var(--space-5);
+  overflow-y: auto;
+  background: var(--color-bg);
+  border-right: var(--line) solid var(--color-line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.bench[hidden] {
+  display: none;
+}
+
+.bench__kicker,
+.bench__btn,
+.bench__state dt,
+.bench__hint,
+.bench__track-index {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: var(--lh-mono);
+  letter-spacing: var(--ls-label);
+  font-stretch: var(--mono-stretch-label);
+  text-transform: uppercase;
+}
+
+.bench__kicker {
+  margin: 0;
+  color: var(--color-text-2);
+}
+
+.bench__index {
+  color: var(--color-accent);
+}
+
+.bench__tracks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bench__track {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-top: var(--line) solid var(--color-line);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bench__track:hover {
+  background: var(--color-surface);
+}
+
+.bench__track.is-selected {
+  background: var(--color-inverse);
+  color: var(--color-on-creme);
+}
+
+.bench__track-index {
+  color: var(--color-text-3);
+}
+
+.bench__track.is-selected .bench__track-index {
+  color: var(--color-on-creme-2);
+}
+
+.bench__track.is-playing .bench__track-index {
+  color: var(--color-on-creme);
+  font-weight: var(--fw-mono-strong);
+}
+
+.bench__track-data,
+.bench__state dd {
+  font-family: var(--font-mono);
+  font-size: var(--fs-data);
+  font-stretch: var(--mono-stretch-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.bench__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bench__btn {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius-0);
+  background: none;
+  cursor: pointer;
+}
+
+.bench__btn:hover,
+.bench__btn[aria-pressed='true'] {
+  background: var(--color-inverse);
+  color: var(--color-on-creme);
+}
+
+.bench__state {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.bench__state dt {
+  color: var(--color-text-2);
+}
+
+.bench__state dd {
+  margin: 0;
+}
+
+.bench__state .is-error {
+  color: var(--color-accent);
+}
+
+.bench__hint {
+  margin: 0;
+  color: var(--color-text-3);
+  text-transform: none;
+  letter-spacing: 0;
+}

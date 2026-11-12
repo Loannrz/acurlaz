@@ -1,0 +1,44 @@
+/* acurlaz · typographie. Deux voix : Bricolage Grotesque (l'artiste), Martian Mono (la machine). */
+
+html {
+  font-family: var(--font-text);
+  background: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-text);
+  font-weight: var(--fw-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-variation-settings: 'opsz' var(--opsz-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, p, dl, dd, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+::selection { background: var(--color-selection-bg); color: var(--color-selection-text); }
+
+.t-giant   { font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-giant); line-height: var(--lh-giant); letter-spacing: var(--ls-giant); font-variation-settings: 'opsz' var(--opsz-display); text-transform: lowercase; }
+.t-title   { font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-title); line-height: var(--lh-title); letter-spacing: var(--ls-title); font-variation-settings: 'opsz' var(--opsz-display); }
+.t-head    { font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-head); line-height: var(--lh-head); letter-spacing: var(--ls-head); font-variation-settings: 'opsz' var(--opsz-head); }
+.t-item    { font-family: var(--font-text); font-weight: var(--fw-item); font-size: var(--fs-item); line-height: var(--lh-item); letter-spacing: var(--ls-item); font-variation-settings: 'opsz' var(--opsz-item); }
+.t-lead    { font-family: var(--font-text); font-weight: var(--fw-text); font-size: var(--fs-lead); line-height: var(--lh-lead); font-variation-settings: 'opsz' var(--opsz-text); max-width: var(--measure); }
+.t-body    { font-family: var(--font-text); font-weight: var(--fw-text); font-size: var(--fs-body); line-height: var(--lh-body); font-variation-settings: 'opsz' var(--opsz-text); max-width: var(--measure); }
+.t-small   { font-family: var(--font-text); font-size: var(--fs-small); line-height: var(--lh-small); }
+.t-label   { font-family: var(--font-mono); font-weight: var(--fw-mono); font-size: var(--fs-label); line-height: var(--lh-mono); letter-spacing: var(--ls-label); font-stretch: var(--mono-stretch-label); text-transform: uppercase; }
+.t-data    { font-family: var(--font-mono); font-weight: var(--fw-mono); font-size: var(--fs-data); line-height: var(--lh-mono); letter-spacing: var(--ls-data); font-stretch: var(--mono-stretch-data); font-variant-numeric: tabular-nums; }
+.t-readout { font-family: var(--font-mono); font-weight: var(--fw-mono); font-size: var(--fs-readout); line-height: 1; font-stretch: var(--mono-stretch-data); font-variant-numeric: tabular-nums; }
+
+.c-2 { color: var(--color-text-2); }
+.c-3 { color: var(--color-text-3); }
+.c-accent { color: var(--color-accent); }
+.on-creme { background: var(--color-inverse); color: var(--color-on-creme); }
+.on-accent { background: var(--color-accent); color: var(--color-on-accent); }
+
+.line { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.line__in { display: block; }

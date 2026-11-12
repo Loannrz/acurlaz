@@ -1,0 +1,215 @@
+/* acurlaz · mise en page : trois plans (backdrop, scène, contenu), sections, mobile. */
+
+html {
+  scroll-padding-top: var(--scroll-pad-top);
+  scroll-padding-bottom: var(--player-h);
+  overflow-x: clip;
+}
+html.is-loading { overflow: hidden; }
+html.menu-open { overflow: hidden; }
+body { overflow-x: clip; min-height: 100svh; }
+body, #app { position: relative; }
+
+[hidden] { display: none !important; }
+
+.wrap { padding-inline: var(--margin); }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); column-gap: var(--gutter); }
+
+/* ------------------------------------------------------------ plan arrière */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--scene-w);
+  height: var(--scene-h);
+  z-index: var(--z-back);
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--color-text);
+}
+
+.scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--scene-w);
+  height: var(--scene-h);
+  z-index: var(--z-scene);
+  touch-action: pan-y;
+}
+
+/* Le mot de la section courante et le logo d'ouverture. La timeline de scène peut les
+   placer et les découper (transform, clip-path, opacity inline : ils l'emportent). */
+.backdrop__word {
+  position: absolute;
+  margin: 0;
+  white-space: nowrap;
+  opacity: 0;
+}
+.backdrop__word.is-current,
+.backdrop__logo.is-current { opacity: 1; }
+
+.backdrop__word[data-section="sons"]    { right: var(--margin); bottom: 20svh; }
+.backdrop__word[data-section="dates"]   { left: var(--margin); top: 50%; font-size: min(var(--fs-giant), 16vw); }
+.backdrop__word[data-section="avec"]    { right: var(--margin); top: 50%; }
+.backdrop__word[data-section="bio"]     { left: var(--margin); bottom: 14svh; }
+.backdrop__word[data-section="contact"] { left: 50%; top: 8svh; translate: -50% 0; font-size: min(var(--fs-giant), 24vw, 30svh); }
+
+.backdrop__logo {
+  position: absolute;
+  left: 4%;
+  bottom: var(--space-8);
+  width: 92%;
+  aspect-ratio: 1518 / 356;
+  background: var(--color-text);
+  -webkit-mask: var(--logo-url) center / contain no-repeat;
+  mask: var(--logo-url) center / contain no-repeat;
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------ contenu */
+main {
+  position: relative;
+  z-index: var(--z-content);
+  pointer-events: none;
+  outline: none;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  padding-inline: var(--margin);
+  pointer-events: none;
+}
+#ouverture { min-height: var(--stage-ouverture); }
+#sons { min-height: var(--stage-sons); }
+#dates { min-height: var(--stage-dates); }
+#avec { min-height: var(--stage-avec); }
+#bio { min-height: var(--stage-bio); }
+#contact { min-height: var(--stage-contact); }
+
+.stage__panel {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100svh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* repli */
+  justify-content: safe center;
+  padding-block: calc(var(--nav-h) + var(--space-4)) calc(var(--player-h) + var(--space-3));
+  pointer-events: auto;
+  container-type: inline-size;
+}
+.stage__panel--left { grid-column: 1 / 6; }
+.stage__panel--right { grid-column: 7 / -1; }
+.stage__panel--center { grid-column: 1 / -1; }
+
+/* Volet : panneau noir opaque sur la moitié du côté, fermé par un filet. */
+.stage__panel--volet {
+  grid-column: 7 / -1;
+  margin-left: calc(var(--gutter) / -2);
+  margin-right: calc(var(--margin) * -1);
+  padding-left: var(--space-6);
+  padding-right: var(--margin);
+  background: var(--color-bg);
+  border-left: var(--line) solid var(--color-line);
+}
+
+.stack { display: flex; flex-direction: column; gap: var(--space-5); min-height: 0; }
+.stack--fill { max-height: 100%; }
+.stack--center { align-items: center; text-align: center; }
+.head { display: flex; flex-direction: column; gap: var(--space-3); flex: none; }
+
+/* Ouverture : rien ne bloque le CDJ, seuls le repère et l'invitation à défiler existent. */
+.stage__panel--ouverture {
+  grid-column: 1 / -1;
+  pointer-events: none;
+  justify-content: flex-start;
+  padding-top: calc(var(--nav-h) + var(--space-3));
+  padding-bottom: 0;
+}
+.intro { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); color: var(--color-text-2); }
+.stage__logo-mobile { display: none; }
+.scroll-cue {
+  position: absolute;
+  right: 0;
+  bottom: var(--space-5);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  color: var(--color-text);
+  text-decoration: none;
+  pointer-events: auto;
+}
+.scroll-cue__line { display: block; width: var(--line); height: var(--space-5); background: var(--color-text); }
+
+/* Contact : le CDJ est en haut, le contenu en bas. */
+.stage__panel--contact { pointer-events: none; justify-content: flex-end; gap: var(--space-6); padding-bottom: calc(var(--player-h) + var(--space-3)); }
+.stage__panel--contact > * { pointer-events: auto; }
+.stage__panel--contact .stack { align-self: center; gap: var(--space-4); }
+.stage__panel--contact .line { display: inline-block; margin-inline: 0.12em; }
+
+/* ------------------------------------------------------------ mobile : scène en bandeau */
+@media (max-width: 899px) {
+  .backdrop {
+    background: var(--color-bg);
+    border-bottom: var(--line) solid var(--color-line);
+  }
+  .backdrop__word,
+  .backdrop__word[data-section] {
+    position: absolute;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    translate: -50% -50%;
+  }
+  .backdrop__word[data-section="contact"] { top: 50%; }
+  .backdrop__logo { display: none; }
+
+  .stage { display: block; }
+  .stage__panel,
+  .stage__panel--volet {
+    position: static;
+    height: auto;
+    margin: 0;
+    padding-block: var(--space-6) var(--space-8);
+    padding-inline: 0;
+    border-left: 0;
+    background: none;
+  }
+  .stage__panel--volet { padding-inline: 0; }
+  #ouverture { min-height: var(--stage-ouverture); }
+  .stage__panel--ouverture {
+    min-height: calc(100svh - var(--scene-h));
+    padding-top: calc(var(--scene-h) + var(--space-5));
+    gap: var(--space-5);
+    justify-content: flex-start;
+  }
+  .stage__logo-mobile {
+    display: block;
+    width: 88%;
+    aspect-ratio: 1518 / 356;
+    background: var(--color-text);
+    -webkit-mask: var(--logo-url) left center / contain no-repeat;
+    mask: var(--logo-url) left center / contain no-repeat;
+    margin-top: auto;
+  }
+  .scroll-cue { position: static; align-self: flex-end; margin-bottom: var(--space-2); }
+  .scroll-cue__line { height: var(--space-6); }
+  .stage__panel--contact { justify-content: flex-start; padding-bottom: var(--space-8); }
+  .stack--fill { max-height: none; }
+  html.has-player body { padding-bottom: var(--player-h); }
+}
+
+/* Téléphone en paysage : scène à gauche, contenu à droite. */
+@media (max-width: 899px) and (orientation: landscape) {
+  .backdrop { border-bottom: 0; border-right: var(--line) solid var(--color-line); }
+  .stage { margin-left: var(--scene-w); padding-inline: var(--margin); }
+  .stage__panel--ouverture { padding-top: calc(var(--nav-h) + var(--space-3)); min-height: 100svh; }
+}

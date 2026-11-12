@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Banc d'essai · scène et défilement</title>
+    <!--
+      Banc d'essai de la scène 3D et de la chorégraphie au défilement. Hors du site : index.html
+      ne le référence pas, `vite build` ne l'embarque pas.
+      Serveur : npx vite, puis /src/scene/bench-stage.html
+      Paramètres : ?k=K2a (aller à une clé) · ?p=0.31 (aller à une valeur de p) · ?hud=0 (sans relevé)
+                   ?gabarits=0 (sans contours de panneaux) · ?doublure=1 (forcer la boîte de remplacement)
+                   ?ui=1 (monter la vraie interface à la place des sections factices)
+      Les trois plans suivent docs/DA.md 13.4. Couleurs et dimensions : jetons de tokens.css.
+    -->
+    <style>
+      html { background: var(--noir); color: var(--creme); overflow-x: clip; }
+      body { margin: 0; overflow-x: clip; font-family: var(--font-mono); font-size: var(--fs-label); font-stretch: var(--mono-stretch-label); }
+
+      /* Plan arrière : mots géants et logo, derrière le CDJ. */
+      .banc-fond { position: fixed; top: 0; left: 0; width: var(--scene-w); height: var(--scene-h); z-index: var(--z-back); overflow: hidden; pointer-events: none; }
+      .banc-fond .backdrop__word {
+        position: absolute; margin: 0; white-space: nowrap; opacity: 0;
+        font-family: var(--font-display); font-weight: var(--fw-display); font-size: var(--fs-giant);
+        line-height: var(--lh-giant); letter-spacing: var(--ls-giant); font-stretch: normal;
+        font-variation-settings: 'opsz' var(--opsz-display); text-transform: lowercase;
+      }
+      .banc-fond [data-section='sons'] { right: var(--margin); bottom: 20svh; }
+      .banc-fond [data-section='dates'] { left: var(--margin); top: 50%; font-size: min(var(--fs-giant), 16vw); }
+      .banc-fond [data-section='avec'] { right: var(--margin); top: 50%; }
+      .banc-fond [data-section='bio'] { left: var(--margin); bottom: 14svh; }
+      .banc-fond [data-section='contact'] { left: 50%; top: 8svh; translate: -50% 0; font-size: min(var(--fs-giant), 24vw, 30svh); }
+      .banc-fond .backdrop__logo {
+        position: absolute; left: 4%; bottom: var(--space-8); width: 92%; aspect-ratio: 1518 / 356; opacity: 0;
+        background: var(--creme);
+        -webkit-mask: url('/img/acurlaz-logo.svg') center / contain no-repeat;
+        mask: url('/img/acurlaz-logo.svg') center / contain no-repeat;
+      }
+      .banc-fond .backdrop__word.is-current,
+      .banc-fond .backdrop__logo.is-current { opacity: 1; }
+
+      /* Scène : canvas transparent calé sur --scene-w / --scene-h. */
+      .banc-scene { position: fixed; top: 0; left: 0; width: var(--scene-w); height: var(--scene-h); z-index: var(--z-scene); touch-action: pan-y; }
+
+      /* Contenu : six sections factices aux hauteurs des jetons --stage-*. */
+      .banc-contenu { position: relative; z-index: var(--z-content); pointer-events: none; }
+      .banc-contenu .stage { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); padding-inline: var(--margin); pointer-events: none; }
+      .banc-contenu #ouverture { min-height: var(--stage-ouverture); }
+      .banc-contenu #sons { min-height: var(--stage-sons); }
+      .banc-contenu #dates { min-height: var(--stage-dates); }
+      .banc-contenu #avec { min-height: var(--stage-avec); }
+      .banc-contenu #bio { min-height: var(--stage-bio); }
+      .banc-contenu #contact { min-height: var(--stage-contact); }
+      .banc-contenu .stage__panel { position: sticky; top: 0; align-self: start; height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; padding-block: calc(var(--nav-h) + var(--space-4)) calc(var(--player-h) + var(--space-3)); pointer-events: auto; }
+      .banc-contenu .stage__panel--left { grid-column: 1 / 6; }
+      .banc-contenu .stage__panel--right { grid-column: 7 / -1; }
+      .banc-contenu .stage__panel--center { grid-column: 1 / -1; pointer-events: none; justify-content: flex-end; }
+      .banc-contenu .stage__panel--volet { grid-column: 7 / -1; margin-left: calc(var(--gutter) / -2); margin-right: calc(var(--margin) * -1); padding-left: var(--space-6); padding-right: var(--margin); background: var(--noir); border-left: var(--line) solid var(--trait); }
+      .gabarit { flex: 1; min-height: var(--space-10); border: var(--line) solid var(--trait); color: var(--creme-3); padding: var(--space-4); letter-spacing: var(--ls-label); text-transform: uppercase; }
+      .stage__panel--center .gabarit { flex: none; align-self: center; width: min(100%, 40rem); height: 34svh; }
+      .sans-gabarits .gabarit { visibility: hidden; }
+
+      /* Relevé : p, section, clé la plus proche, mesures de cadrage. */
+      .banc-releve { position: fixed; left: var(--space-3); bottom: var(--space-3); z-index: var(--z-skip); max-width: min(46rem, calc(100vw - 2 * var(--space-3))); padding: var(--space-3); background: var(--noir); border: var(--line) solid var(--trait-fort); color: var(--creme-2); line-height: 1.5; letter-spacing: 0.02em; }
+      .banc-releve strong { color: var(--creme); font-weight: var(--fw-mono-strong); }
+      .banc-releve .actif { color: var(--accent); }
+      .banc-releve nav { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-top: var(--space-2); }
+      .banc-releve button { min-height: 1.75rem; padding: 0 var(--space-2); background: var(--noir); border: var(--line) solid var(--trait-fort); border-radius: var(--radius-0); color: var(--creme); font: inherit; cursor: pointer; }
+      .banc-releve button:hover { background: var(--creme); color: var(--noir); }
+      .banc-releve button[aria-pressed='true'] { background: var(--accent); border-color: var(--accent); color: var(--noir); }
+      .sans-releve .banc-releve { display: none; }
+
+      @media (max-width: 899px) {
+        .banc-fond { background: var(--noir); border-bottom: var(--line) solid var(--trait); }
+        .banc-fond .backdrop__word[data-section] { left: 50%; right: auto; top: 50%; bottom: auto; translate: -50% -50%; }
+        .banc-fond .backdrop__logo { display: none; }
+        .banc-contenu .stage { display: block; }
+        .banc-contenu .stage__panel,
+        .banc-contenu .stage__panel--volet { position: static; height: auto; margin: 0; padding-block: var(--space-6) var(--space-8); padding-inline: 0; border-left: 0; background: none; }
+        .banc-contenu #ouverture .stage__panel { padding-top: calc(var(--scene-h) + var(--space-5)); }
+        .gabarit, .stage__panel--center .gabarit { flex: none; width: auto; height: 46svh; }
+        .banc-releve { font-size: 0.6875rem; }
+      }
+      @media (max-width: 899px) and (orientation: landscape) {
+        .banc-fond { border-bottom: 0; border-right: var(--line) solid var(--trait); }
+        .banc-contenu .stage { margin-left: var(--scene-w); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="backdrop banc-fond" aria-hidden="true">
+        <span class="backdrop__logo" data-section="ouverture"></span>
+        <span class="backdrop__word" data-section="sons">sons</span>
+        <span class="backdrop__word" data-section="dates">dates</span>
+        <span class="backdrop__word" data-section="avec">avec</span>
+        <span class="backdrop__word" data-section="bio">bio</span>
+        <span class="backdrop__word" data-section="contact">contact</span>
+      </div>
+      <canvas class="scene banc-scene" aria-hidden="true"></canvas>
+      <main id="contenu" class="banc-contenu">
+        <section class="stage" id="ouverture"><div class="stage__panel stage__panel--center"></div></section>
+        <section class="stage" id="sons"><div class="stage__panel stage__panel--left"><div class="gabarit">01 · sons · colonnes 1 à 5</div></div></section>
+        <section class="stage" id="dates"><div class="stage__panel stage__panel--right"><div class="gabarit">02 · dates · colonnes 7 à 12</div></div></section>
+        <section class="stage" id="avec"><div class="stage__panel stage__panel--left"><div class="gabarit">03 · avec · colonnes 1 à 5</div></div></section>
+        <section class="stage" id="bio"><div class="stage__panel stage__panel--volet"><div class="gabarit">04 · bio · volet</div></div></section>
+        <section class="stage" id="contact"><div class="stage__panel stage__panel--center"><div class="gabarit">05 · contact · centré</div></div></section>
+      </main>
+    </div>
+    <aside class="banc-releve" aria-label="Relevé du banc d'essai">
+      <div id="releve-etat">chargement</div>
+      <div id="releve-mesures"></div>
+      <nav id="releve-cles" aria-label="Clés de caméra"></nav>
+    </aside>
+    <script type="module" src="./bench-stage.js"></script>
+  </body>
+</html>

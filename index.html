@@ -1,111 +1,30 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="format-detection" content="telephone=no" />
-    <title>Acurlaz</title>
-    <meta name="description" content="Acurlaz, DJ de musique électronique : ses sons, ses prochaines dates et ses réseaux, sur deux platines et une table de mixage en 3D." />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>acurlaz | DJ et producteur</title>
+    <meta name="description" content="Site de acurlaz, DJ et producteur : morceaux, dates, artistes invités et contact." />
+    <meta name="theme-color" content="#0A0908" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Acurlaz" />
-    <meta property="og:description" content="DJ de musique électronique : sons, prochaines dates et réseaux, sur deux platines et une table de mixage en 3D." />
+    <meta property="og:title" content="acurlaz | DJ et producteur" />
+    <meta property="og:description" content="Site de acurlaz, DJ et producteur : morceaux, dates, artistes invités et contact." />
     <meta property="og:locale" content="fr_FR" />
-    <link rel="icon" href="data:," />
-    <!-- Logo of the loading screen: fetched first, so it shows before any script. -->
-    <link rel="preload" as="image" href="%BASE_URL%img/acurlaz-logo.png" fetchpriority="high" />
-    <!-- 3D model: fetched while the scripts download (same request mode as the
-         fetch of src/scene/units.js). The build ships a gzipped copy (vite.config.js
-         sets gz = true): it is preloaded only where it can be inflated
-         (DecompressionStream; old Safari gets the plain .glb, as units.js does). -->
-    <script>
-      (function () {
-        var gz = false;
-        var link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'fetch';
-        link.crossOrigin = 'anonymous';
-        link.href = '%BASE_URL%models/pioneer_cdj_3000.glb' + (gz && typeof DecompressionStream === 'function' ? '.gz' : '');
-        document.head.appendChild(link);
-      })();
-    </script>
-    <!-- Loading screen: inline so it is the very first paint (no blank page, no
-         flash of the default background) while the scripts and assets load.
-         Driven by src/ui/loader.js. -->
-    <style>
-      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
-      /* Phones: the page never scrolls, bounces or zooms (the canvas handles
-         every gesture itself); 100dvh = the visible height with the browser bars. */
-      html, body { overscroll-behavior: none; touch-action: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
-      @supports (height: 100dvh) { html, body { height: 100dvh; } }
-      /* Loading screen: the logo (public/img/acurlaz-logo.png), dimmed and grey, is
-         filled in white from left to right as the real progress advances (two
-         stacked copies; the top one is white and clipped), with a small percentage
-         under its right corner. Driven by src/ui/loader.js; nothing else moves. */
-      #loader {
-        position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
-        background: #000;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        transition: opacity 700ms ease;
-      }
-      #loader.done { opacity: 0; pointer-events: none; }
-      #loader[hidden] { display: none; }
-      #loader .loader-box {
-        position: relative; box-sizing: border-box; width: min(60vw, 520px);
-        margin: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-      }
-      #loader .loader-logo { position: relative; }
-      #loader .loader-logo img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
-      #loader .loader-base { opacity: 0.15; filter: grayscale(1); }
-      #loader .loader-fill {
-        position: absolute; left: 0; top: 0;
-        filter: brightness(0) invert(1);
-        clip-path: inset(0 100% 0 0);
-      }
-      #loader .loader-pct {
-        position: absolute; right: 2.5%; top: calc(84% + 5px);
-        font-size: 12px; font-weight: 300; letter-spacing: 0.06em; line-height: 1;
-        font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.55);
-      }
-      #loader.failed .loader-pct { display: none; }
-      #loader .loader-error { text-align: center; margin-top: 8px; }
-      #loader .loader-error[hidden] { display: none; }
-      #loader .loader-msg { margin: 0 0 18px; font-size: 14px; line-height: 1.45; color: rgba(255, 255, 255, 0.86); }
-      #loader .loader-error button {
-        appearance: none; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 999px; background: transparent;
-        color: #fff; font: 500 13px/1 inherit; font-family: inherit; padding: 11px 22px; cursor: pointer;
-      }
-      #loader .loader-error button:hover { background: rgba(255, 255, 255, 0.08); }
-      #loader .loader-error button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-      @media (pointer: coarse) {
-        #loader .loader-error button { min-height: 44px; padding: 13px 26px; font-size: 15px; touch-action: manipulation; }
-        #loader .loader-pct { font-size: 13px; }
-        #loader .loader-msg { font-size: 15px; }
-      }
-      @media (pointer: coarse) and (orientation: portrait) { #loader .loader-box { width: 70vw; } }
-      @media (prefers-reduced-motion: reduce) { #loader { transition: none; } }
-    </style>
-    <link rel="stylesheet" href="/src/styles.css" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/models/pioneer_cdj_3000.glb" as="fetch" crossorigin />
   </head>
   <body>
-    <div id="loader" aria-busy="true">
-      <div class="loader-box" role="progressbar" aria-label="Chargement de l’introduction" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Chargement 0 %">
-        <div class="loader-logo">
-          <img class="loader-base" src="%BASE_URL%img/acurlaz-logo.png" width="1600" height="533" alt="Acurlaz" fetchpriority="high" decoding="sync" />
-          <img class="loader-fill" src="%BASE_URL%img/acurlaz-logo.png" width="1600" height="533" alt="" aria-hidden="true" fetchpriority="high" decoding="sync" />
-        </div>
-        <span class="loader-pct" aria-hidden="true">0 %</span>
-        <div class="loader-error" role="alert" hidden>
-          <p class="loader-msg"></p>
-          <button type="button">Réessayer</button>
-        </div>
+    <a class="skip-link t-label" href="#contenu">Aller au contenu</a>
+    <div class="loader" id="loader" role="status" aria-live="polite">
+      <div class="loader__logo" aria-hidden="true">
+        <span class="loader__ink"></span>
+        <span class="loader__ink loader__ink--fill"></span>
       </div>
+      <p class="loader__count t-data" aria-hidden="true">000</p>
+      <p class="sr-only" id="loader-sr">Chargement, 0 %</p>
     </div>
     <div id="app"></div>
-    <div id="flash"></div>
-    <button id="skip" class="hidden" type="button" aria-label="Passer l’introduction" inert>Passer</button>
-    <noscript><p style="position:fixed;inset:0;z-index:60;margin:0;display:grid;place-items:center;background:#000;color:#bbb;font:14px sans-serif">Activez JavaScript pour voir l’introduction.</p></noscript>
+    <noscript><p style="padding:1rem;font-family:sans-serif">Ce site demande JavaScript pour s'afficher.</p></noscript>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

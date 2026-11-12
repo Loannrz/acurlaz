@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0A0908" />
+    <title>Banc d'essai · CDJ</title>
+  </head>
+  <body>
+    <canvas class="scene" aria-hidden="true"></canvas>
+    <aside class="bench" hidden>
+      <p class="bench__kicker"><span class="bench__index">00</span> Banc d'essai · CDJ seul</p>
+      <ul class="bench__tracks"></ul>
+      <div class="bench__row">
+        <button class="bench__btn" type="button" data-action="toggle">Lire</button>
+        <button class="bench__btn" type="button" data-action="prev">Précédent</button>
+        <button class="bench__btn" type="button" data-action="next">Suivant</button>
+      </div>
+      <dl class="bench__state"></dl>
+      <div class="bench__row bench__views"></div>
+      <div class="bench__row bench__lights"></div>
+      <p class="bench__hint">Glisser pour tourner, molette pour approcher. Le bouton Play du CDJ se clique dans la scène.</p>
+    </aside>
+    <script type="module" src="./bench.js"></script>
+  </body>
+</html>
