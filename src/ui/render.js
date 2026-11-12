@@ -92,7 +92,7 @@ function dateRow(d, isNext) {
         isNext ? '<span class="tag tag--accent t-label">Prochaine</span>' : ''
       }</span>
     </div>
-    <span class="drow__time t-data"><span class="sr-only">Set à </span>${fmtHour(d.set)}</span>
+    <span class="drow__time t-data"><span class="sr-only">Set à </span>${esc(fmtHour(d.set))}</span>
     <div class="drow__action">${action}</div>
   </li>`;
 }

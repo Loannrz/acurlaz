@@ -8,6 +8,7 @@ Référence visuelle et chorégraphie : docs/DA.md (section 13 fait foi). Modèl
 - Interface HTML/CSS : index.html (corps de page uniquement), src/ui/**, src/styles/typography.css, layout.css, components.css (tokens.css et base.css sont figés ; ajout dans base.css interdit)
 - Logo : public/img/acurlaz-logo.svg
 - src/main.js : propriété de l'orchestrateur. Chaque module exporte seulement une fonction d'init.
+- Régie et API de contenu : admin/index.html, src/admin/**, src/data/remote.js, worker/** (mise en ligne et sécurité : worker/README.md). Le schéma du contenu éditable vit dans worker/src/schema.js : le Worker, la régie et le site valident avec le même fichier. La régie n'importe ni three ni gsap, n'emploie jamais innerHTML et suit la même DA (src/admin/admin.css).
 
 ## API exportées
 - `src/audio/player.js` : `export const player = { select(trackId), toggle(), play(), pause(), get state() }` ; émet `player:state` sur le bus (changement + ~10 fois/s pendant la lecture). `player.init(tracks)` reçoit `content.tracks`. Un seul morceau à la fois.

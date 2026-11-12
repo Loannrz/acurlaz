@@ -1,0 +1,13 @@
+# Copier ce fichier en .dev.vars (ignoré par git) pour `npx wrangler dev`.
+# En production, ces valeurs sont des secrets : `npx wrangler secret put NOM`.
+# Les valeurs ci-dessous ne marchent pas telles quelles : le Worker refuse un secret de
+# moins de 32 caractères et un mot de passe initial vide.
+
+# Secret du Worker, 32 caractères au moins. Générer : openssl rand -base64 48
+AUTH_SECRET="A_REMPLACER"
+
+# Mot de passe initial. Il amorce l'accès à la première connexion, puis ne vaut que 15 minutes.
+INITIAL_PASSWORD=""
+
+# Origines autorisées en développement (remplace la valeur de wrangler.toml).
+ALLOWED_ORIGINS="http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173"

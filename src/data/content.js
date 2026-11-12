@@ -33,8 +33,9 @@ export const about = {
   photoAlt: 'Portrait en noir et blanc, visage de profil',
 };
 
-// Adresse de contact : à fournir. Vide, le bouton « Écrire » reste désactivé
-// (libellé « adresse à venir ») ; remplie, il ouvre un mailto et propose « Copier l'adresse ».
+// Adresse de contact. Vide, les boutons « Écrire » et « Copier l'adresse » ne s'affichent
+// pas ; remplie, « Écrire » ouvre un mailto. Comme les dates, les artistes, la bio et les
+// liens, elle se modifie depuis la régie (/admin) : la valeur ci-dessous n'est que le repli.
 export const contact = { email: '' };
 
 export const links = [

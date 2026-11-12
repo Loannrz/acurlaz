@@ -1,0 +1,41 @@
+# API de contenu d'acurlaz. Étapes de mise en ligne : README.md.
+name = "acurlaz-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+preview_urls = false
+
+# Stockage : contenu, empreinte du mot de passe, sessions, compteurs de tentatives.
+# Remplacer l'identifiant par celui que rend `npx wrangler kv namespace create CONTENT_KV`.
+[[kv_namespaces]]
+binding = "CONTENT_KV"
+id = "ef2cf7948fc24baa810aa2e52c6dcb77"
+
+[vars]
+# Origines autorisées à appeler l'API, séparées par des virgules. Jamais « * ».
+# En développement, .dev.vars remplace cette valeur par les adresses localhost.
+ALLOWED_ORIGINS = "https://loannrz.github.io"
+# PBKDF2-HMAC-SHA256. 100000 est le plafond accepté par Workers.
+PBKDF2_ITERATIONS = "100000"
+# Durée d'une session, en secondes (2 heures).
+SESSION_TTL_SECONDS = "7200"
+# Tant que le mot de passe initial est en service, la régie peut lire mais pas publier.
+# "false" lève ce verrou : déconseillé, le mot de passe initial est facile à deviner.
+REQUIRE_PASSWORD_CHANGE = "true"
+
+# Garde-fou contre les rafales : 10 tentatives de connexion par minute et par adresse.
+# Complète le blocage progressif tenu dans KV. `namespace_id` est un entier libre,
+# unique dans le compte Cloudflare.
+[[ratelimits]]
+name = "LOGIN_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
+
+# Journaux : seulement les lignes écrites par le code (événements, empreinte tronquée de
+# l'adresse). Les journaux d'invocation, qui portent les détails de chaque requête, sont coupés.
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+invocation_logs = false
